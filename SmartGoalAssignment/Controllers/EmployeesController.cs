@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using DataAccess.Employees;
 using SmartGoalAssignment.Models;
 
 
@@ -19,7 +20,7 @@ namespace SmartGoalAssignment.Controllers
         // GET: Employees
         public ActionResult Index()
         {
-            return View(db.Employees.ToList());
+            return View(EmployeeRepository.GetAllEmployees());
         }
 
         // GET: Employees/Details/5
