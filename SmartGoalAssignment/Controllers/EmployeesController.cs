@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using DataAccess.Employees;
 using DataAccess;
+
 //using SmartGoalAssignment.Models;
 
 namespace SmartGoalAssignment.Controllers
@@ -27,19 +28,16 @@ namespace SmartGoalAssignment.Controllers
         public ActionResult Index()
         {
             var employer = EmployeeRepository.GetAllEmployees();
-            //employer2 = (SmartGoalAssignment.Models.Employee)employer;
+            
            return View(employer.ToList());
         }
 
         // GET: Employees/Details/5
         public ActionResult Details(int id)
         {
-            //if (id == null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //}
-           // Employee employee = db.Employees.Find(id);
+           
            Employee employee = EmployeeRepository.GetDetailsByID(id);
+
             if (employee == null)
             {
                 return HttpNotFound();
@@ -73,11 +71,7 @@ namespace SmartGoalAssignment.Controllers
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {
-            //if (id == null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //}
-
+      
             Employee employee = EmployeeRepository.GetDetailsByID(id);
             EmployeeRepository.UpdateEmployee(employee);
             if (employee == null)
@@ -106,13 +100,10 @@ namespace SmartGoalAssignment.Controllers
         // GET: Employees/Delete/5
         public ActionResult Delete(int id)
         {
-            //if (id == null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //}
+           
             EmployeeRepository.DeleteEmployee(id);
             
-            return View(id);
+            return View();
         }
 
         // POST: Employees/Delete/5
