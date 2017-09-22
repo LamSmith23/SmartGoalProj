@@ -52,7 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DapperBase.cs" />
     <Compile Include="Employee.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -72,6 +71,7 @@
       <DependentUpon>Employee.tt</DependentUpon>
     </Compile>
     <Compile Include="Employees\EmployeeRepository.cs" />
+    <Compile Include="Employees\IEmployeeRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

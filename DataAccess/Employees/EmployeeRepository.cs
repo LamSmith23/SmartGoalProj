@@ -11,25 +11,68 @@ using System.Data.Entity;
 
 namespace DataAccess.Employees
 {
-    public class EmployeeRepository : DapperBase
+    public class EmployeeRepository : IEmployeeRepository
     {
         private AdventureWorks2014Entities db = new AdventureWorks2014Entities();
-
-        public static List<Employee> GetAllEmployees()
+        public EmployeeRepository(AdventureWorks2014Entities adventureWorks2014Entities)
         {
-
-            Employee em = new Employee();
-            List<Employee> EmployeeUserList = new List<Employee>();
-            string sql = @"SELECT * 
-  FROM [AdventureWorks2014].[HumanResources].[Employee]";
-            using (var con = Open(DBHelper.ConnectionString))
-            {
-                CommandDefinition command = new CommandDefinition(sql, commandType: CommandType.Text);
-                EmployeeUserList = con.Query<Employee>(command).ToList();
-            }
-            return EmployeeUserList;
+            this.db = adventureWorks2014Entities;
         }
 
-        
+        public IEnumerable<Employee> GetAllEmployees()
+        {
+            return db.Employees.ToList();
+        }
+
+        public Employee GetDetailsByID(int id)
+        {
+            return db.Employees.Find(id);
+        }
+
+        public void AddEmployee(Employee employee)
+        {
+            db.Employees.Add(employee);
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            Employee employee = db.Employees.Find(id);
+            db.Employees.Remove(employee);
+        }
+
+        public void UpdateEmployee(Employee employee)
+        {
+            db.Entry(employee).State = EntityState.Modified;
+        }
+
+        public void Save()
+        {
+            db.SaveChanges();
+        }
+
+        private bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    db.Dispose();
+                }
+            }
+            this.disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
+
+
+
+
+
 }
