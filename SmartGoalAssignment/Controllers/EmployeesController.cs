@@ -6,30 +6,38 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using SmartGoalAssignment.Models;
+using DataAccess.Employees;
+using DataAccess;
 
-
+//using SmartGoalAssignment.Models;
 
 namespace SmartGoalAssignment.Controllers
 {
+
     public class EmployeesController : Controller
     {
-        private AdventureWorks2014Entities db = new AdventureWorks2014Entities();
+        private IEmployeeRepository  EmployeeRepository;
+        public EmployeesController()
+        {
+            AdventureWorks2014Entities db = new AdventureWorks2014Entities();
+
+        EmployeeRepository = new EmployeeRepository(db);
+        }
 
         // GET: Employees
         public ActionResult Index()
         {
-            return View(db.Employees.ToList());
+            var employer = EmployeeRepository.GetAllEmployees();
+            
+           return View(employer.ToList());
         }
 
         // GET: Employees/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult Details(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Employee employee = db.Employees.Find(id);
+           
+           Employee employee = EmployeeRepository.GetDetailsByID(id);
+
             if (employee == null)
             {
                 return HttpNotFound();
@@ -40,7 +48,7 @@ namespace SmartGoalAssignment.Controllers
         // GET: Employees/Create
         public ActionResult Create()
         {
-            return View();
+            return View(new Employee());
         }
 
         // POST: Employees/Create
@@ -48,12 +56,12 @@ namespace SmartGoalAssignment.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "BusinessEntityID,NationalIDNumber,LoginID,OrganizationLevel,JobTitle,BirthDate,MaritalStatus,Gender,HireDate,SalariedFlag,VacationHours,SickLeaveHours,CurrentFlag,rowguid,ModifiedDate")] Employee employee)
+        public ActionResult Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
-                db.Employees.Add(employee);
-                db.SaveChanges();
+                EmployeeRepository.AddEmployee(employee);
+                EmployeeRepository.Save();
                 return RedirectToAction("Index");
             }
 
@@ -61,13 +69,11 @@ namespace SmartGoalAssignment.Controllers
         }
 
         // GET: Employees/Edit/5
-        public ActionResult Edit(int? id)
+        public ActionResult Edit(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Employee employee = db.Employees.Find(id);
+      
+            Employee employee = EmployeeRepository.GetDetailsByID(id);
+            EmployeeRepository.UpdateEmployee(employee);
             if (employee == null)
             {
                 return HttpNotFound();
@@ -80,30 +86,24 @@ namespace SmartGoalAssignment.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "BusinessEntityID,NationalIDNumber,LoginID,OrganizationLevel,JobTitle,BirthDate,MaritalStatus,Gender,HireDate,SalariedFlag,VacationHours,SickLeaveHours,CurrentFlag,rowguid,ModifiedDate")] Employee employee)
+        public ActionResult Edit( Employee employee)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(employee).State = EntityState.Modified;
-                db.SaveChanges();
+                EmployeeRepository.UpdateEmployee(employee);
+                EmployeeRepository.Save();
                 return RedirectToAction("Index");
             }
             return View(employee);
         }
 
         // GET: Employees/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Employee employee = db.Employees.Find(id);
-            if (employee == null)
-            {
-                return HttpNotFound();
-            }
-            return View(employee);
+           
+            EmployeeRepository.DeleteEmployee(id);
+            
+            return View();
         }
 
         // POST: Employees/Delete/5
@@ -111,9 +111,9 @@ namespace SmartGoalAssignment.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Employee employee = db.Employees.Find(id);
-            db.Employees.Remove(employee);
-            db.SaveChanges();
+            Employee employee = EmployeeRepository.GetDetailsByID(id);
+            EmployeeRepository.DeleteEmployee(id);
+            EmployeeRepository.Save();
             return RedirectToAction("Index");
         }
 
@@ -121,7 +121,7 @@ namespace SmartGoalAssignment.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                EmployeeRepository.Dispose();
             }
             base.Dispose(disposing);
         }
